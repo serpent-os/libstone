@@ -34,6 +34,11 @@ const containerHeader = 0x006d6f73;
  * These fields are static for all time to ensure compatability in upgrade
  * paths, whilst allowing each format to specify how the remaining bytes of the
  * header should be used.
+ *
+ * Occupied memory:
+ *
+ *  [0   .. 4] = uint32_t [magic (4b)]
+ *  [$-4 .. $] = uint32_t [version (4b)]
  */
 public struct AgnosticContainerHeader
 {
