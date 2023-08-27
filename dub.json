@@ -8,5 +8,6 @@
 	"license": "MPL-2.0",
 	"name": "libstone",
     "targetType": "autodetect",
-	"targetName": "stone"
+	"targetName": "stone",
+	"dflags": ["-preview=dip1000", "-preview=in", "-betterC"]
 }
