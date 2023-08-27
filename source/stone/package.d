@@ -15,4 +15,5 @@
 
 module stone;
 
+public import stone.headers;
 public import stone.reader;
