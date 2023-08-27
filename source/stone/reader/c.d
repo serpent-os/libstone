@@ -17,7 +17,7 @@ module stone.reader.c;
 
 @safe:
 
-extern(C)
+extern (C)
 {
-    export:
+export:
 }
