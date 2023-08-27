@@ -20,26 +20,12 @@ import std.bitmanip : bigEndianToNative;
 
 @safe:
 
+public import stone.headers.v1;
+
 /** 
  * We expect all stone container files to have this magic sequence in 
  */
 const containerHeader = 0x006d6f73;
-
-@system unittest
-{
-    import core.sys.posix.unistd : read, close;
-    import core.sys.posix.fcntl : open, O_RDONLY;
-    import core.stdc.stdio : printf;
-
-    auto fi = open("test/manifest.x86_64.bin", O_RDONLY);
-    assert(fi > 0);
-    scope (exit)
-        fi.close;
-
-    AgnosticContainerHeader hdr;
-    assert(fi.read(hdr.ptr, hdr.sizeof) == hdr.sizeof);
-    assert(hdr.magic == containerHeader);
-}
 
 /** 
  * The header is initially read as an AgnosticContainerHeader, allowing
