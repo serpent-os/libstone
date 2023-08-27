@@ -5,14 +5,14 @@
  */
 
 /**
- * stone
+ * stone.reader
  *
- * Main `.stone` library
+ * APIs to read stone archive files
  *
  * Authors: Copyright © 2020-2023 Serpent OS Developers
  * License: MPL-2.0
  */
 
-module stone;
+module stone.reader;
 
-public import stone.reader;
+@safe:
