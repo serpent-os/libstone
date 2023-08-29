@@ -27,6 +27,14 @@ public import stone.headers.v1;
  */
 const containerHeader = 0x006d6f73;
 
+/**
+ * Version of the header format
+ */
+public enum HeaderVersion : uint32_t
+{
+    v1 = 1,
+}
+
 /** 
  * The header is initially read as an AgnosticContainerHeader, allowing
  * only two fields to be read: `version` and `magic`
@@ -51,10 +59,10 @@ public struct AgnosticContainerHeader
     /** 
      * Returns: the version identifer as an integer (stored: BE)
      */
-    pragma(inline, true) pure @property uint32_t version_()
+    pragma(inline, true) pure @property HeaderVersion version_()
     {
         ubyte[uint32_t.sizeof] byteSection = rawHeader[$ - uint32_t.sizeof .. $];
-        return bigEndianToNative!(uint32_t, uint32_t.sizeof)(byteSection);
+        return bigEndianToNative!(HeaderVersion, HeaderVersion.sizeof)(byteSection);
     }
 
     /** 
@@ -63,9 +71,9 @@ public struct AgnosticContainerHeader
      * Params:
      *   newVersion = Version to set within the payload
      */
-    pragma(inline, true) pure @property void version_(uint32_t newVersion)
+    pragma(inline, true) pure @property void version_(HeaderVersion newVersion)
     {
-        rawHeader[$ - uint32_t.sizeof .. $] = nativeToBigEndian(newVersion);
+        rawHeader[$ - HeaderVersion.sizeof .. $] = nativeToBigEndian(newVersion);
     }
 
     /** 

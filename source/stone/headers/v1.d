@@ -17,7 +17,7 @@ module stone.headers.v1;
 
 public import std.stdint : uint8_t, uint16_t, uint32_t;
 
-import stone.headers : AgnosticContainerHeader, containerHeader;
+import stone.headers : AgnosticContainerHeader, HeaderVersion, containerHeader;
 import std.bitmanip : bigEndianToNative;
 
 @safe:
@@ -26,9 +26,9 @@ import std.bitmanip : bigEndianToNative;
 {
     auto hdr = cast(AgnosticContainerHeader) import("bash-completion-2.11-1-1-x86_64.stone");
     assert(hdr.magic == containerHeader);
+    assert(hdr.version_ == HeaderVersion.v1);
 
     auto v1Hdr = cast(StoneContainerHeaderV1) hdr;
-    assert(v1Hdr.version_ == 1);
     assert(v1Hdr.payloads == 4);
     assert(v1Hdr.integrity == integrityCheck);
     assert(v1Hdr.type == FileType.binary);
