@@ -90,6 +90,7 @@ public struct AgnosticContainerHeader
 
 package:
     pragma(inline, true) pure @property T data(T)()
+            if (T.sizeof == 24 && __traits(isPOD, T))
     {
         return cast(T) data_;
     }
