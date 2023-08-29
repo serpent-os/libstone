@@ -22,24 +22,14 @@ import std.bitmanip : bigEndianToNative;
 
 @safe:
 
-@system unittest
+@safe unittest
 {
-    import core.sys.posix.unistd : read, close;
-    import core.sys.posix.fcntl : open, O_RDONLY;
-    import core.stdc.stdio : printf;
-
-    auto fi = open("test/bash-completion-2.11-1-1-x86_64.stone", O_RDONLY);
-    assert(fi > 0);
-    scope (exit)
-        fi.close;
-
-    AgnosticContainerHeader hdr;
-    assert(fi.read(hdr.ptr, hdr.sizeof) == hdr.sizeof);
+    auto hdr = cast(AgnosticContainerHeader) import("bash-completion-2.11-1-1-x86_64.stone");
     assert(hdr.magic == containerHeader);
 
     auto v1Hdr = cast(StoneContainerHeaderV1) hdr;
     assert(v1Hdr.version_ == 1);
-    printf("Headers: %d\n", v1Hdr.payloads);
+    assert(v1Hdr.payloads == 4);
     assert(v1Hdr.integrity == integrityCheck);
     assert(v1Hdr.type == FileType.binary);
 }
