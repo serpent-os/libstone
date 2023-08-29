@@ -60,7 +60,7 @@ public enum FileType : uint8_t
 public struct StoneContainerHeaderV1
 {
     /** 
-     * 32-byte sequence - interchangeable (lossless) with AgnosticContainerHeader
+     * 32-byte struct - interchangeable (lossless) with AgnosticContainerHeader
      */
     AgnosticContainerHeader hdr;
     alias hdr this;
@@ -70,8 +70,7 @@ public struct StoneContainerHeaderV1
      */
     pragma(inline, true) pure @property uint16_t payloads() @safe @nogc nothrow
     {
-        ubyte[uint16_t.sizeof] rawBytes = hdr[uint32_t.sizeof .. uint32_t.sizeof + uint16_t.sizeof];
-        return bigEndianToNative!(uint16_t, uint16_t.sizeof)(rawBytes);
+        return bigEndianToNative!(uint16_t, uint16_t.sizeof)(data.payloads);
     }
 
     /** 
@@ -79,8 +78,7 @@ public struct StoneContainerHeaderV1
      */
     pragma(inline, true) pure @property ubyte[integrityCheck.length] integrity() @safe @nogc nothrow
     {
-        return hdr[uint32_t.sizeof + uint16_t.sizeof .. uint32_t.sizeof
-            + uint16_t.sizeof + integrityCheck.length];
+        return data.integrity;
     }
 
     /** 
@@ -88,6 +86,19 @@ public struct StoneContainerHeaderV1
      */
     pragma(inline, true) pure @property FileType type() @safe @nogc nothrow
     {
-        return cast(FileType) hdr[$ - (uint32_t.sizeof + FileType.sizeof)];
+        return data.type;
     }
+
+private:
+    pragma(inline, true) pure @property StoneContainerHeaderV1Data data() @safe @nogc nothrow
+    {
+        return hdr.data!StoneContainerHeaderV1Data;
+    }
+}
+
+package struct StoneContainerHeaderV1Data
+{
+    ubyte[uint16_t.sizeof] payloads;
+    ubyte[integrityCheck.length] integrity;
+    FileType type;
 }
