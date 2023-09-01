@@ -94,25 +94,25 @@ public struct StonePayloadHeaderV1
 
 package struct StonePayloadHeaderV1Data
 {
-    // Real Size
+    /* Real size */
     ubyte[uint64_t.sizeof] size_;
 
-    // Decompressed size
+    /* Decompressed size */
     ubyte[uint64_t.sizeof] xsize_;
 
-    // Checksum (XXHash3!64)
+    /* XXH3 (64) checksum */
     ubyte[8] checksum_;
 
-    // Number of records contained in the payload
+    /* Number of payload records */
     ubyte[uint32_t.sizeof] records_;
 
-    // Version of the payload per *type*
+    /* Version of the payload per *type* */
     ubyte[uint16_t.sizeof] version__;
 
-    // Type of the payload
+    /* Tagged payload type */
     PayloadType type_;
 
-    // And finally, the compression algorithm used.
+    /* And finally, the compression algorithm used. */
     CompressionType compression_;
 }
 
