@@ -23,7 +23,7 @@ import std.bitmanip : bigEndianToNative, nativeToBigEndian;
 public import stone.headers.v1;
 
 /** 
- * We expect all stone container files to have this magic sequence in 
+ * The legal, moss-specific file magic header
  */
 const containerHeader = 0x006d6f73;
 
