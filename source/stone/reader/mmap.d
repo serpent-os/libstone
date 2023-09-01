@@ -90,4 +90,11 @@ private:
     size_t fileSize;
 }
 
+/** 
+ * Attempt to map a file to a kernel-side buffer
+ *
+ * Params:
+ *   path = Filesystem path to verify
+ * Returns: A MappedFile with no-copy semantics
+ */
 auto mappedFile(const char* path) => MappedFile(path);
