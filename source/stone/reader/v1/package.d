@@ -18,7 +18,7 @@ module stone.reader.v1;
 /** 
  * V1 specific payload reader
  */
-package struct StoneReaderV1
+package(stone.reader) struct StoneReaderV1
 {
 
 }

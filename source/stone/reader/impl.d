@@ -90,7 +90,7 @@ package struct StoneReader(Range)
     /**
      * Attempt to read the archive, and return the appropriate Reader type for it
      */
-    StoneReadResult read() @nogc nothrow
+    StoneReadResult read() @safe @nogc nothrow
     {
         /* Ensure we have a valid header first! */
         if (data.length > AgnosticContainerHeader.sizeof)
