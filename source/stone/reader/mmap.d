@@ -23,6 +23,18 @@ import core.sys.posix.unistd : close;
 import core.sys.posix.sys.mman;
 import core.sys.posix.sys.stat;
 
+@safe unittest
+{
+    auto nonExistent = mappedFile("REAMDE.notmd");
+    auto data = nonExistent[0 .. 32];
+    assert(data == null);
+
+    /* Check README header matches expectations */
+    auto doExist = mappedFile("README.md");
+    static immutable cmp = ['#', ' ', 'l', 'i', 'b', 's', 't', 'o', 'n', 'e'];
+    assert(doExist[0 .. cmp.length] == cmp);
+}
+
 /** 
  * Map a file and make it usable as a D ubyte[] range
  */
