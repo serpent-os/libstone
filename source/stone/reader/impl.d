@@ -80,7 +80,6 @@ public alias StoneReadResult = SumType!(StoneReaderV1, StoneReaderError);
  *
  * Params:
  *      Range = Range type
- *      isRC = Set to true for `.borrow` semantics
  */
 package struct StoneReader(Range)
         if (isInputRange!Range && hasLength!Range && is(ElementType!Range : ubyte))
