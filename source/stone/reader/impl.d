@@ -17,8 +17,38 @@ module stone.reader.impl;
 
 import std.range : ElementType, isInputRange, hasLength;
 import stone.headers : AgnosticContainerHeader;
+public import std.sumtype;
+
+public import stone.headers : containerHeader, HeaderVersion;
+public import stone.reader.v1 : StoneReaderV1;
 
 @safe:
+
+/**
+ * Possible errors when reading a stone archive
+ */
+public enum StoneReaderError
+{
+    /**
+     * Invalid header (too short, etc)
+     */
+    badHeader,
+
+    /**
+     * Unsupported version
+     */
+    badVersion,
+
+    /**
+     * Magic in header didn't match supported stone values
+     */
+    badMagic,
+}
+
+/**
+ * Result for .read
+ */
+public alias StoneReadResult = SumType!(StoneReaderV1, StoneReaderError);
 
 @safe unittest
 {
@@ -34,6 +64,14 @@ import stone.headers : AgnosticContainerHeader;
     /* grab a reader for ubyte[] */
     auto spBased = stoneReader(builtin);
     assert(spBased.data.length == 394);
+
+    /* Grab a reader for the stone file */
+    spBased.read.match!((scope ref StoneReaderV1 v1) {
+        /* Should have a v1 reader! */
+    }, (err) {
+        /* Catch all invalid stones */
+        assert(0, "Invalid stone!");
+    });
 }
 
 /**
@@ -51,16 +89,35 @@ package struct StoneReader(Range)
     AgnosticContainerHeader header;
 
     /**
-     * Prime the Reader and ensure we have a header
+     * Attempt to read the archive, and return the appropriate Reader type for it
      */
-    ref prime()
+    StoneReadResult read() @nogc nothrow
     {
+        /* Ensure we have a valid header first! */
         if (data.length > AgnosticContainerHeader.sizeof)
         {
             header = cast(AgnosticContainerHeader)(
                     cast(ubyte[32]) data[0 .. AgnosticContainerHeader.sizeof]);
         }
-        return this;
+        else
+        {
+            return StoneReadResult(StoneReaderError.badHeader);
+        }
+
+        /* Magic matches us? */
+        if (header.magic != containerHeader)
+        {
+            return StoneReadResult(StoneReaderError.badMagic);
+        }
+
+        /* Return the right version.. */
+        switch (header.version_)
+        {
+        case HeaderVersion.v1:
+            return StoneReadResult(StoneReaderV1());
+        default:
+            return StoneReadResult(StoneReaderError.badVersion);
+        }
     }
 }
 
@@ -88,11 +145,11 @@ auto stoneReader(const char* path)
         }
     }
 
-    return MappedReader(path).prime;
+    return MappedReader(path);
 }
 
 /**
  * Construct a new StoneReader for the given input range
  * Note: The range must be a ubyte[] slice with a known length.
  */
-auto stoneReader(Range)(Range input) => StoneReader!Range(input).prime;
+auto stoneReader(Range)(Range input) => StoneReader!Range(input);
