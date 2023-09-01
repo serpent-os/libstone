@@ -5,15 +5,15 @@
  */
 
 /**
- * stone.headers.v1
+ * stone.headers.v1.container
  *
- * Version 1 archive headers for the stone format
+ * Version 1 container headers for the stone format
  *
  * Authors: Copyright © 2020-2023 Serpent OS Developers
  * License: MPL-2.0
  */
 
-module stone.headers.v1;
+module stone.headers.v1.container;
 
 public import std.stdint : uint8_t, uint16_t, uint32_t;
 
