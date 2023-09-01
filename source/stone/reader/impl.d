@@ -16,6 +16,7 @@
 module stone.reader.impl;
 
 import std.range : ElementType, isInputRange, hasLength;
+import stone.headers : AgnosticContainerHeader;
 
 @safe:
 
@@ -47,6 +48,20 @@ package struct StoneReader(Range)
         if (isInputRange!Range && hasLength!Range && is(ElementType!Range : ubyte))
 {
     Range data;
+    AgnosticContainerHeader header;
+
+    /**
+     * Prime the Reader and ensure we have a header
+     */
+    ref prime()
+    {
+        if (data.length > AgnosticContainerHeader.sizeof)
+        {
+            header = cast(AgnosticContainerHeader)(
+                    cast(ubyte[32]) data[0 .. AgnosticContainerHeader.sizeof]);
+        }
+        return this;
+    }
 }
 
 /**
@@ -73,11 +88,11 @@ auto stoneReader(const char* path)
         }
     }
 
-    return MappedReader(path);
+    return MappedReader(path).prime;
 }
 
 /**
  * Construct a new StoneReader for the given input range
  * Note: The range must be a ubyte[] slice with a known length.
  */
-auto stoneReader(Range)(Range input) => StoneReader!Range(input);
+auto stoneReader(Range)(Range input) => StoneReader!Range(input).prime;
