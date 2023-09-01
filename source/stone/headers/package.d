@@ -25,7 +25,7 @@ public import stone.headers.v1;
 /** 
  * The legal, moss-specific file magic header
  */
-const containerHeader = 0x006d6f73;
+public enum containerHeader = 0x006d6f73;
 
 /**
  * Version of the header format
@@ -53,7 +53,7 @@ public struct AgnosticContainerHeader
     /** 
      * Returns: the version identifer as an integer (stored: BE)
      */
-    pragma(inline, true) pure @property HeaderVersion version_()
+    pragma(inline, true) pure @property HeaderVersion version_() @nogc nothrow
     {
         return bigEndianToNative!(HeaderVersion, HeaderVersion.sizeof)(version__);
     }
@@ -64,7 +64,7 @@ public struct AgnosticContainerHeader
      * Params:
      *   newVersion = Version to set within the payload
      */
-    pragma(inline, true) pure @property void version_(HeaderVersion newVersion)
+    pragma(inline, true) pure @property void version_(HeaderVersion newVersion) @nogc nothrow
     {
         version__ = nativeToBigEndian(newVersion);
     }
@@ -72,7 +72,7 @@ public struct AgnosticContainerHeader
     /** 
      * Returns: Magic identifier for the container header (stored: BE)
      */
-    pragma(inline, true) pure @property uint32_t magic()
+    pragma(inline, true) pure @property uint32_t magic() @nogc nothrow
     {
         return bigEndianToNative!(uint32_t, uint32_t.sizeof)(magic_);
     }
@@ -83,7 +83,7 @@ public struct AgnosticContainerHeader
      * Params:
      *   newMagic = New magic setting
      */
-    pragma(inline, true) pure @property void magic(uint32_t newMagic)
+    pragma(inline, true) pure @property void magic(uint32_t newMagic) @nogc nothrow
     {
         magic_ = nativeToBigEndian(newMagic);
     }
@@ -91,7 +91,7 @@ public struct AgnosticContainerHeader
     AgnosticContainerHeaderPayload payload;
 
 package:
-    pragma(inline, true) pure @property T data(T)()
+    pragma(inline, true) pure @property T data(T)() @nogc nothrow 
             if (T.sizeof == 24 && __traits(isPOD, T))
     {
         return cast(T) data_;
