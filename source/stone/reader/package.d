@@ -15,4 +15,4 @@
 
 module stone.reader;
 
-@safe:
+public import stone.reader.impl;

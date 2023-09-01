@@ -53,13 +53,18 @@ public struct MappedFile
      */
     auto opSlice(size_t start, size_t end) @nogc nothrow
     {
-        if (start > end || end > fileSize)
+        if (start > end || end > fileSize || fileSize == 0)
             return null;
 
         return () @trusted { return cast(ubyte[])(dataPage[start .. end]); }();
     }
 
-    ubyte[] opSlice() => opSlice[0 .. fileSize];
+    ubyte[] opSlice() @nogc nothrow
+    {
+        if (fileSize == 0)
+            return null;
+        return () @trusted { return cast(ubyte[])(dataPage[0 .. fileSize]); }();
+    }
 
     /** 
      * Returns: Length of the mapped file
