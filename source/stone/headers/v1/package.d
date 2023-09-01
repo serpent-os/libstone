@@ -13,4 +13,7 @@
  * License: MPL-2.0
  */
 
+module stone.headers.v1;
+
 public import stone.headers.v1.container;
+public import stone.headers.v1.payload;
