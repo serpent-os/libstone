@@ -27,6 +27,14 @@ public import stone.headers.v1;
  */
 const containerHeader = 0x006d6f73;
 
+/**
+ * Version of the header format
+ */
+public enum HeaderVersion : uint32_t
+{
+    v1 = 1,
+}
+
 /** 
  * The header is initially read as an AgnosticContainerHeader, allowing
  * only two fields to be read: `version` and `magic`
@@ -43,18 +51,11 @@ const containerHeader = 0x006d6f73;
 public struct AgnosticContainerHeader
 {
     /** 
-     * Raw data for this header.
-     */
-    ubyte[32] rawHeader;
-    alias rawHeader this;
-
-    /** 
      * Returns: the version identifer as an integer (stored: BE)
      */
-    pragma(inline, true) pure @property uint32_t version_()
+    pragma(inline, true) pure @property HeaderVersion version_()
     {
-        ubyte[uint32_t.sizeof] byteSection = rawHeader[$ - uint32_t.sizeof .. $];
-        return bigEndianToNative!(uint32_t, uint32_t.sizeof)(byteSection);
+        return bigEndianToNative!(HeaderVersion, HeaderVersion.sizeof)(version__);
     }
 
     /** 
@@ -63,9 +64,9 @@ public struct AgnosticContainerHeader
      * Params:
      *   newVersion = Version to set within the payload
      */
-    pragma(inline, true) pure @property void version_(uint32_t newVersion)
+    pragma(inline, true) pure @property void version_(HeaderVersion newVersion)
     {
-        rawHeader[$ - uint32_t.sizeof .. $] = nativeToBigEndian(newVersion);
+        version__ = nativeToBigEndian(newVersion);
     }
 
     /** 
@@ -73,8 +74,7 @@ public struct AgnosticContainerHeader
      */
     pragma(inline, true) pure @property uint32_t magic()
     {
-        ubyte[uint32_t.sizeof] byteSection = rawHeader[0 .. uint32_t.sizeof];
-        return bigEndianToNative!(uint32_t, uint32_t.sizeof)(byteSection);
+        return bigEndianToNative!(uint32_t, uint32_t.sizeof)(magic_);
     }
 
     /** 
@@ -85,6 +85,24 @@ public struct AgnosticContainerHeader
      */
     pragma(inline, true) pure @property void magic(uint32_t newMagic)
     {
-        rawHeader[0 .. uint32_t.sizeof] = nativeToBigEndian(newMagic);
+        magic_ = nativeToBigEndian(newMagic);
     }
+
+package:
+    pragma(inline, true) pure @property T data(T)()
+            if (T.sizeof == 24 && __traits(isPOD, T))
+    {
+        return cast(T) data_;
+    }
+
+private:
+    AgnosticContainerHeaderPayload payload;
+    alias payload this;
+}
+
+package struct AgnosticContainerHeaderPayload
+{
+    ubyte[4] magic_;
+    ubyte[24] data_;
+    ubyte[4] version__;
 }

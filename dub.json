@@ -9,5 +9,5 @@
 	"name": "libstone",
     "targetType": "autodetect",
 	"targetName": "stone",
-	"dflags": ["-preview=dip1000", "-preview=in", "-betterC"]
+	"dflags": ["-preview=dip1000", "-preview=in", "-betterC", "-J=test"]
 }
