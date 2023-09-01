@@ -16,7 +16,7 @@
 
 module stone.reader.mmap;
 
-@safe @nogc nothrow:
+@safe:
 
 import core.sys.posix.fcntl : open, O_RDONLY, O_CLOEXEC;
 import core.sys.posix.unistd : close;
@@ -31,13 +31,27 @@ public struct MappedFile
     @disable this();
     @disable this(this);
 
-    auto opSlice(size_t start, size_t end) @trusted
+    /** 
+     * Slice the mapped file
+     *
+     * Params:
+     *   start = Start of the requested slice
+     *   end = End of the requested slice
+     * Returns: a ubyte[] slice for the given input
+     */
+    auto opSlice(size_t start, size_t end) @nogc nothrow
     {
-        ubyte[] rng = cast(ubyte[])(dataPage[start .. end]);
-        return rng;
+        if (start > end || end > fileSize)
+            return null;
+
+        return () @trusted { return cast(ubyte[])(dataPage[start .. end]); }();
     }
 
+    /** 
+     * Returns: Length of the mapped file
+     */
     auto opDollar() @nogc nothrow => fileSize;
+    alias length = opDollar;
 
 private:
 
