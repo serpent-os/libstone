@@ -17,6 +17,7 @@ module stone.reader.impl;
 
 import std.range : ElementType, isInputRange, hasLength;
 import stone.headers : AgnosticContainerHeader;
+import stone.reader.mmap : mappedFile, MappedFile;
 public import std.sumtype;
 
 public import stone.headers : containerHeader, HeaderVersion;
@@ -130,31 +131,10 @@ package struct StoneReader(Range)
  * Return a StoneReader for the given input path
  * Note: This is automatically wrapped into an mmap reader
  */
-auto stoneReader(const char* path)
-{
-    import stone.reader.mmap : mappedFile, MappedFile;
-
-    static struct MappedReader
-    {
-        MappedFile mf;
-        StoneReader!(ubyte[]) parent;
-        alias parent this;
-
-        @disable this(this);
-        @disable this();
-
-        this(const char* path) @trusted
-        {
-            this.mf = mappedFile(path);
-            this.data = mf[];
-        }
-    }
-
-    return MappedReader(path);
-}
+StoneReader!MappedFile stoneReader(const char* path) => StoneReader!MappedFile(mappedFile(path));
 
 /**
  * Construct a new StoneReader for the given input range
  * Note: The range must be a ubyte[] slice with a known length.
  */
-auto stoneReader(Range)(Range input) => StoneReader!Range(input);
+StoneReader!Range stoneReader(Range)(Range input) => StoneReader!Range(input);

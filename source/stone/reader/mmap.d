@@ -26,8 +26,7 @@ import core.sys.posix.sys.stat;
 @safe unittest
 {
     auto nonExistent = mappedFile("REAMDE.notmd");
-    auto data = nonExistent[0 .. 32];
-    assert(data == null);
+    assert(nonExistent == null);
 
     /* Check README header matches expectations */
     auto doExist = mappedFile("README.md");
@@ -40,37 +39,11 @@ import core.sys.posix.sys.stat;
  */
 public struct MappedFile
 {
+    alias data this;
+    ubyte[] data;
+
     @disable this();
     @disable this(this);
-
-    /** 
-     * Slice the mapped file
-     *
-     * Params:
-     *   start = Start of the requested slice
-     *   end = End of the requested slice
-     * Returns: a ubyte[] slice for the given input
-     */
-    auto opSlice(size_t start, size_t end) @nogc nothrow
-    {
-        if (start > end || end > fileSize || fileSize == 0)
-            return null;
-
-        return () @trusted { return cast(ubyte[])(dataPage[start .. end]); }();
-    }
-
-    ubyte[] opSlice() @nogc nothrow
-    {
-        if (fileSize == 0)
-            return null;
-        return () @trusted { return cast(ubyte[])(dataPage[0 .. fileSize]); }();
-    }
-
-    /** 
-     * Returns: Length of the mapped file
-     */
-    auto opDollar() @nogc nothrow => fileSize;
-    alias length = opDollar;
 
     ~this() @trusted nothrow @nogc
     {
@@ -101,6 +74,8 @@ private:
         dataPage = mmap(null, result.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
         if (dataPage is null)
             return;
+
+        data = cast(ubyte[])(dataPage[0 .. fileSize]);
     }
 
     /* Underlying file descriptor */
