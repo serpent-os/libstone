@@ -90,7 +90,6 @@ package struct StoneReader(Range)
         if (isInputRange!Range && hasLength!Range && is(ElementType!Range : ubyte))
 {
     Range data;
-    AgnosticContainerHeader header;
 
     /**
      * Attempt to read the archive, and return the appropriate Reader type for it
@@ -98,15 +97,14 @@ package struct StoneReader(Range)
     StoneReadResult read() return @safe @nogc nothrow
     {
         /* Ensure we have a valid header first! */
-        if (data.length > AgnosticContainerHeader.sizeof)
-        {
-            header = cast(AgnosticContainerHeader)(
-                    cast(ubyte[32]) data[0 .. AgnosticContainerHeader.sizeof]);
-        }
-        else
+        if (data.length <= AgnosticContainerHeader.sizeof)
         {
             return StoneReadResult(StoneReaderError.badHeader);
         }
+
+        auto header = cast(AgnosticContainerHeader)(
+                cast(ubyte[32]) data[0 .. AgnosticContainerHeader.sizeof]);
+        auto payload = data[AgnosticContainerHeader.sizeof .. $];
 
         /* Magic matches us? */
         if (header.magic != containerHeader)
@@ -119,7 +117,7 @@ package struct StoneReader(Range)
         {
         case HeaderVersion.v1:
             return StoneReadResult(StoneReaderV1(cast(StoneContainerHeaderV1) header, () @trusted {
-                    return data[AgnosticContainerHeader.sizeof .. $].assumeUnique;
+                    return payload.assumeUnique;
                 }()));
         default:
             return StoneReadResult(StoneReaderError.badVersion);
