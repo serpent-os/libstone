@@ -20,7 +20,10 @@ import stone.headers : AgnosticContainerHeader;
 public import std.sumtype;
 
 public import stone.headers : containerHeader, HeaderVersion;
+
+import stone.headers.v1 : StoneContainerHeaderV1;
 public import stone.reader.v1 : StoneReaderV1;
+import std.exception : assumeUnique;
 
 @safe:
 
@@ -53,8 +56,8 @@ public alias StoneReadResult = SumType!(StoneReaderV1, StoneReaderError);
 @safe unittest
 {
     /* mmap test */
-    auto fpBased = stoneReader("test/manifest.x86_64.bin");
-    assert(fpBased.data.length == 394);
+    auto fpBased = stoneReader("test/bash-completion-2.11-1-1-x86_64.stone");
+    assert(fpBased.data.length == 168864);
 
     /* cook in a file */
     static immutable builtin = () @trusted {
@@ -66,8 +69,9 @@ public alias StoneReadResult = SumType!(StoneReaderV1, StoneReaderError);
     assert(spBased.data.length == 394);
 
     /* Grab a reader for the stone file */
-    spBased.read.match!((scope ref StoneReaderV1 v1) {
+    fpBased.read.match!((scope ref StoneReaderV1 v1) {
         /* Should have a v1 reader! */
+        v1.print();
     }, (err) {
         /* Catch all invalid stones */
         assert(0, "Invalid stone!");
@@ -90,7 +94,7 @@ package struct StoneReader(Range)
     /**
      * Attempt to read the archive, and return the appropriate Reader type for it
      */
-    StoneReadResult read() @safe @nogc nothrow
+    StoneReadResult read() return @safe @nogc nothrow
     {
         /* Ensure we have a valid header first! */
         if (data.length > AgnosticContainerHeader.sizeof)
@@ -113,7 +117,9 @@ package struct StoneReader(Range)
         switch (header.version_)
         {
         case HeaderVersion.v1:
-            return StoneReadResult(StoneReaderV1());
+            return StoneReadResult(StoneReaderV1(cast(StoneContainerHeaderV1) header, () @trusted {
+                    return data[AgnosticContainerHeader.sizeof .. $].assumeUnique;
+                }()));
         default:
             return StoneReadResult(StoneReaderError.badVersion);
         }

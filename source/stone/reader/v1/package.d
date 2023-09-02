@@ -15,10 +15,20 @@
 
 module stone.reader.v1;
 
+import stone.headers.v1;
+
 /** 
  * V1 specific payload reader
  */
 package(stone.reader) struct StoneReaderV1
 {
+    StoneContainerHeaderV1 header;
 
+    /* Remaining data */
+    immutable(ubyte[]) data;
+
+    void print() @trusted scope
+    {
+        imported!"core.stdc.stdio".printf("I have %d payloads\n", header.payloads);
+    }
 }
