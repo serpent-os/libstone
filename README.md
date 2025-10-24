@@ -1,7 +1,11 @@
+**This project is no longer active**
+
+---
+
 # libstone
 
 A low level, direct access library for manipulating `.stone` archive files,
-as used by the [Serpent OS](https://serpentos.com) distribution tooling.
+as used by the Serpent OS distribution tooling.
 
 ### License
 
